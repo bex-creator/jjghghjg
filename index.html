@@ -535,9 +535,23 @@
                 setupConnectionListeners(conn);
             });
 
-            peerInstance.on('error', (err) => {
+            peerInstance.on('error', async (err) => {
                 console.error("PeerJS Error:", err);
-                showToast(`Network Error: ${err.type}`, "error");
+                if (err.type === 'unavailable-id') {
+                    showToast("Session active elsewhere. Generating new ID...", "info");
+                    // Generate a new ID and save it to the database
+                    myId = `peer_${generateRandomId()}`;
+                    myIdInput.value = myId;
+                    await dbPut('settings', { key: 'myId', value: myId });
+                    
+                    // Destroy the failed instance and try again
+                    if (peerInstance) {
+                        peerInstance.destroy();
+                    }
+                    setTimeout(initPeerJS, 500);
+                } else {
+                    showToast(`Network Error: ${err.type}`, "error");
+                }
             });
         };
 
