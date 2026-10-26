@@ -188,7 +188,7 @@
                         <span class="text-[11px] text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider">Your Unique ID:</span>
                     </div>
                     <div class="flex items-center gap-2">
-                        <input id="my-id-input" type="text" readonly value="Loading..." class="flex-1 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-1.5 text-xs font-mono text-gray-700 dark:text-gray-300 focus:outline-none" />
+                        <input id="my-id-input" type="text" readonly value="Loading..." class="flex-1 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-1.5 text-xs font-mono font-bold text-blue-600 dark:text-blue-400 focus:outline-none" />
                         <button id="copy-btn" class="p-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300 transition-colors" title="Copy ID">
                             <svg id="icon-copy" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
                             <svg id="icon-check" class="hidden text-emerald-600 dark:text-emerald-400" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
@@ -198,7 +198,7 @@
 
                 <!-- Connect Input Section (Desktop) -->
                 <form id="connect-form" class="relative hidden md:block">
-                    <input id="connect-input" type="text" placeholder="Paste friend's User ID" class="w-full pl-4 pr-20 py-2.5 bg-[#f0f4f9] dark:bg-gray-800 border-none rounded-full text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white" />
+                    <input id="connect-input" type="text" placeholder="Paste friend's ID (e.g. Alex-402)" class="w-full pl-4 pr-20 py-2.5 bg-[#f0f4f9] dark:bg-gray-800 border-none rounded-full text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white" />
                     <button type="submit" id="connect-btn" disabled class="absolute right-1 top-1 bottom-1 px-3.5 bg-[#0b57d0] text-white text-xs font-medium rounded-full hover:bg-blue-700 disabled:opacity-50 transition-colors">
                         Add
                     </button>
@@ -247,24 +247,24 @@
                         </div>
                         <div>
                             <h2 id="chat-header-name" class="text-sm font-semibold text-gray-900 dark:text-white leading-tight">...</h2>
-                            <p id="chat-header-status-text" class="text-[11px] text-gray-500 dark:text-gray-400">Cloud Synced</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Messages List -->
-                <div id="messages-list" class="flex-1 overflow-y-auto p-4 flex flex-col gap-3 bg-[#f8fafd] dark:bg-gray-950/40"></div>
-
-                <!-- Message Input Footer -->
-                <div class="p-3 bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800">
-                    <form id="message-form" class="flex items-end gap-2 bg-[#f0f4f9] dark:bg-gray-800 rounded-[24px] p-1.5 pl-4">
-                        <textarea id="message-input" rows="1" placeholder="Text message" class="flex-1 max-h-32 min-h-[40px] bg-transparent border-none focus:outline-none resize-none py-2 text-xs text-gray-800 dark:text-gray-100 self-center"></textarea>
-                        <button type="submit" id="send-btn" disabled class="p-2.5 bg-[#0b57d0] text-white rounded-full hover:bg-blue-700 disabled:opacity-40 transition-colors flex items-center justify-center">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-                        </button>
-                    </form>
-                </div>
+    <!-- Custom Modal for New Chat (Mobile FAB Action) -->
+    <div id="new-chat-modal" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm hidden transition-opacity">
+        <div class="bg-white dark:bg-gray-900 p-6 rounded-t-3xl sm:rounded-2xl shadow-xl w-full max-w-md border border-gray-200 dark:border-gray-800">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Start New Chat</h3>
+                <button id="close-new-chat-btn" class="p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
             </div>
+            <form id="modal-connect-form" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 mb-1">Friend's Easy ID</label>
+                    <input id="modal-connect-input" type="text" placeholder="e.g. Alex-402" class="w-full px-4 py-3 bg-[#f0f4f9] dark:bg-gray-800 text-sm rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white" />
+                </div>
+                <button type="submit" id="modal-connect-btn" disabled class="w-full py-3 bg-[#0b57d0] text-white font-medium text-sm rounded-xl hover:bg-blue-700 disabled:opacity-50 transition-colors">
+                    Add & Open Chat
+                </button>
+            </form>
         </div>
     </div>
 
@@ -291,9 +291,23 @@
         // App Id for Artifact Scope
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'chatspace-app';
 
+        // --- Helper to Generate Short Easy ID ---
+        const generateEasyId = () => {
+            const savedEasyId = localStorage.getItem('google_messages_easy_id');
+            if (savedEasyId) return savedEasyId;
+
+            const names = ['Alex', 'Sam', 'Jordan', 'Taylor', 'Morgan', 'Riley', 'Casey', 'Dakota', 'Avery', 'Skyler', 'Logan', 'Quinn'];
+            const randomName = names[Math.floor(Math.random() * names.length)];
+            const randomNum = Math.floor(100 + Math.random() * 900); // 3-digit number
+            const newEasyId = `${randomName}-${randomNum}`;
+            localStorage.setItem('google_messages_easy_id', newEasyId);
+            return newEasyId;
+        };
+
         // --- State ---
         let myId = '';
-        let myName = localStorage.getItem('google_messages_name') || `User_${Math.random().toString(36).substring(2, 6)}`;
+        let easyId = generateEasyId();
+        let myName = localStorage.getItem('google_messages_name') || easyId;
         let isDarkMode = localStorage.getItem('google_messages_theme') === 'dark';
         let activeChatId = null;
         let contacts = []; 
@@ -439,7 +453,7 @@
             }
 
             currentUser = auth.currentUser;
-            myId = currentUser.uid;
+            myId = easyId; // Use the short, memorable Easy ID
             myIdInput.value = myId;
             myNameInput.value = myName;
 
@@ -450,10 +464,11 @@
                 </span>
             `;
 
-            // Register public profile
+            // Register public profile under Easy ID
             await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'profiles', myId), {
                 id: myId,
                 name: myName,
+                realUid: currentUser.uid,
                 avatar: `https://api.dicebear.com/7.x/identicon/svg?seed=${myId}`,
                 updatedAt: Date.now()
             }, { merge: true });
@@ -627,31 +642,32 @@
 
         // Connect To Peer/User logic
         const connectToUser = async (targetUserId) => {
-            if (!targetUserId || targetUserId === myId) {
-                showToast("Invalid User ID", "error");
+            const cleanTargetId = targetUserId.trim();
+            if (!cleanTargetId || cleanTargetId.toLowerCase() === myId.toLowerCase()) {
+                showToast("Invalid or self User ID", "error");
                 return;
             }
 
             try {
                 // Fetch public profile from Firestore
-                const profileDoc = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'profiles', targetUserId));
-                let targetName = `User ${targetUserId.substring(0, 5)}`;
+                const profileDoc = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'profiles', cleanTargetId));
+                let targetName = cleanTargetId;
                 
                 if (profileDoc.exists()) {
                     targetName = profileDoc.data().name || targetName;
                 }
 
                 let contact = {
-                    id: targetUserId,
+                    id: cleanTargetId,
                     name: targetName,
-                    avatar: `https://api.dicebear.com/7.x/identicon/svg?seed=${targetUserId}`,
+                    avatar: `https://api.dicebear.com/7.x/identicon/svg?seed=${cleanTargetId}`,
                     lastMessage: 'Tap to chat',
                     timestamp: Date.now(),
                     unread: 0
                 };
 
-                await setDoc(doc(db, 'artifacts', appId, 'users', myId, 'contacts', targetUserId), contact, { merge: true });
-                selectContact(targetUserId);
+                await setDoc(doc(db, 'artifacts', appId, 'users', myId, 'contacts', cleanTargetId), contact, { merge: true });
+                selectContact(cleanTargetId);
                 showToast(`Added ${targetName}!`, 'success');
             } catch (err) {
                 showToast("Could not find user profile", "error");
