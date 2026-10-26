@@ -49,12 +49,41 @@
             from { transform: translateY(0); opacity: 1; }
             to { transform: translateY(100%); opacity: 0; }
         }
+        /* Mobile Slide Transitions */
+        .slide-in-right {
+            animation: slideRight 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        @keyframes slideRight {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
     </style>
 </head>
 <body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 h-screen w-full flex overflow-hidden transition-colors duration-200">
 
     <!-- Toast Notifications Container -->
-    <div id="toast-container" class="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 flex flex-col gap-2 pointer-events-none"></div>
+    <div id="toast-container" class="fixed bottom-20 md:bottom-6 left-1/2 transform -translate-x-1/2 z-50 flex flex-col gap-2 pointer-events-none w-11/12 max-w-md"></div>
+
+    <!-- Custom Modal for New Chat (Mobile FAB Action) -->
+    <div id="new-chat-modal" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm hidden transition-opacity">
+        <div class="bg-white dark:bg-gray-900 p-6 rounded-t-3xl sm:rounded-2xl shadow-xl w-full max-w-md border border-gray-200 dark:border-gray-800">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Start New Chat</h3>
+                <button id="close-new-chat-btn" class="p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <form id="modal-connect-form" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-gray-500 dark:text-gray-400 mb-1">Friend's Peer ID</label>
+                    <input id="modal-connect-input" type="text" placeholder="Paste ID here (e.g. peer_x89a2b)" class="w-full px-4 py-3 bg-[#f0f4f9] dark:bg-gray-800 text-sm rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white" />
+                </div>
+                <button type="submit" id="modal-connect-btn" disabled class="w-full py-3 bg-[#0b57d0] text-white font-medium text-sm rounded-xl hover:bg-blue-700 disabled:opacity-50 transition-colors">
+                    Connect & Start Chat
+                </button>
+            </form>
+        </div>
+    </div>
 
     <!-- Custom Modal for Data Reset -->
     <div id="reset-modal" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm hidden transition-opacity">
@@ -101,138 +130,125 @@
     <div class="flex h-screen w-full">
         
         <!-- Sidebar -->
-        <div id="sidebar" class="w-full md:w-[360px] lg:w-[400px] border-r border-gray-200 dark:border-gray-800 flex flex-col bg-white dark:bg-gray-900 transition-all duration-300 z-20">
+        <div id="sidebar" class="w-full md:w-[360px] lg:w-[400px] border-r border-gray-200 dark:border-gray-800 flex flex-col bg-white dark:bg-gray-900 transition-all duration-300 z-20 relative">
             
             <!-- Sidebar Header -->
-            <div class="p-4 flex flex-col gap-4 border-b border-gray-100 dark:border-gray-800">
+            <div class="p-4 flex flex-col gap-3 border-b border-gray-100 dark:border-gray-800">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2">
-                        <button id="theme-toggle" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full text-gray-600 dark:text-gray-300 transition-colors">
-                            <!-- Moon icon (shows in light mode) -->
+                        <button id="theme-toggle" class="p-2.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full text-gray-600 dark:text-gray-300 transition-colors">
                             <svg id="icon-moon" class="hidden w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
-                            <!-- Sun icon (shows in dark mode) -->
                             <svg id="icon-sun" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                         </button>
-                        <button id="open-settings-btn" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full text-gray-600 dark:text-gray-300 transition-colors" title="Settings">
+                        <button id="open-settings-btn" class="p-2.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full text-gray-600 dark:text-gray-300 transition-colors" title="Settings">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                         </button>
-                        <h1 class="text-xl text-gray-700 dark:text-gray-200 font-normal tracking-wide ml-1 truncate max-w-[120px] sm:max-w-none">P2P Messages</h1>
+                        <h1 class="text-xl font-semibold text-gray-800 dark:text-gray-100 tracking-tight ml-1">Messages</h1>
                     </div>
                     <div id="connection-status" class="flex items-center gap-2 text-xs font-medium">
-                        <span class="flex items-center gap-1 text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-full">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 2l20 20"/><path d="M8.53 8.53a9 9 0 0 1 11.23 3.65"/><path d="M12.36 12.36a3 3 0 0 1 3.52 3.52"/><path d="M5 5a15 15 0 0 1-2 2 15 15 0 0 1 18-2"/><path d="M16 16a15 15 0 0 1-14-1"/></svg>
-                            Initializing...
+                        <span class="flex items-center gap-1.5 text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2.5 py-1 rounded-full">
+                            <span class="w-2 h-2 rounded-full bg-yellow-500 animate-pulse"></span>
+                            Connecting...
                         </span>
                     </div>
                 </div>
                 
                 <!-- Profile Section -->
-                <div class="bg-[#f0f4f9] dark:bg-gray-800 rounded-2xl p-3 flex flex-col gap-3">
-                    <!-- Name Input -->
+                <div class="bg-[#f0f4f9] dark:bg-gray-800/80 rounded-2xl p-3 flex flex-col gap-2.5">
                     <div>
-                        <span class="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider ml-1">Display Name</span>
-                        <input id="my-name-input" type="text" placeholder="Set your name" class="mt-1 w-full bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl px-3 py-2 text-sm text-gray-700 dark:text-gray-200 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition-colors"/>
+                        <span class="text-[11px] text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wider ml-1">Display Name</span>
+                        <input id="my-name-input" type="text" placeholder="Set your name" class="mt-1 w-full bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl px-3 py-2 text-sm text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"/>
                     </div>
-                    <!-- ID Input -->
                     <div>
-                        <span class="text-xs flex justify-between items-center text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider ml-1">
-                            <span>Your Peer ID (Share to chat)</span>
+                        <span class="text-[11px] flex justify-between items-center text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wider ml-1">
+                            <span>Your Peer ID</span>
                         </span>
                         <div class="flex items-center gap-2 mt-1">
-                            <input id="my-id-input" type="text" readonly value="Loading..." class="flex-1 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl px-3 py-2 text-sm text-gray-700 dark:text-gray-200 focus:outline-none"/>
+                            <input id="my-id-input" type="text" readonly value="Loading..." class="flex-1 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl px-3 py-2 text-xs font-mono text-gray-700 dark:text-gray-200 focus:outline-none truncate"/>
                             <button id="copy-btn" class="p-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300 transition-colors" title="Copy ID">
-                                <svg id="icon-copy" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
-                                <svg id="icon-check" class="hidden text-green-600 dark:text-green-400" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                <svg id="icon-copy" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                                <svg id="icon-check" class="hidden text-green-600 dark:text-green-400" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Connect Section -->
-                <form id="connect-form" class="relative mt-2">
+                <!-- Connect Bar (Desktop View) -->
+                <form id="connect-form" class="hidden md:flex relative mt-1">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-500 dark:text-gray-400"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-gray-400"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg>
                     </div>
-                    <input id="connect-input" type="text" placeholder="Paste friend's ID to connect" class="w-full pl-10 pr-20 py-3 bg-[#f0f4f9] dark:bg-gray-800 dark:text-gray-100 border-none rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 transition-shadow"/>
-                    <button type="submit" id="connect-btn" disabled class="absolute right-1 top-1 bottom-1 px-4 bg-[#0b57d0] text-white text-sm font-medium rounded-full hover:bg-blue-700 disabled:opacity-50 transition-colors">
+                    <input id="connect-input" type="text" placeholder="Paste friend's ID to connect" class="w-full pl-10 pr-20 py-2.5 bg-[#f0f4f9] dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-none rounded-full text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"/>
+                    <button type="submit" id="connect-btn" disabled class="absolute right-1 top-1 bottom-1 px-3 bg-[#0b57d0] text-white text-xs font-medium rounded-full hover:bg-blue-700 disabled:opacity-50 transition-colors">
                         Connect
                     </button>
                 </form>
             </div>
 
-            <!-- Conversations List -->
-            <div id="contacts-list" class="flex-1 overflow-y-auto pb-4">
+            <!-- Contacts List -->
+            <div id="contacts-list" class="flex-1 overflow-y-auto pb-20 md:pb-4">
                 <!-- Populated by JS -->
             </div>
+
+            <!-- Mobile Floating Action Button (Start Chat) -->
+            <button id="open-new-chat-fab" class="md:hidden fixed right-5 bottom-6 bg-[#0b57d0] text-white px-5 py-3.5 rounded-2xl shadow-lg flex items-center gap-2 font-medium text-sm hover:bg-blue-700 active:scale-95 transition-all z-30">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                <span>Start chat</span>
+            </button>
         </div>
 
         <!-- Main Chat Area -->
-        <div id="chat-area" class="flex-1 hidden md:flex flex-col relative bg-white dark:bg-gray-900">
+        <div id="chat-area" class="flex-1 hidden md:flex flex-col relative bg-white dark:bg-gray-900 transition-all">
             
             <!-- Default Empty State -->
             <div id="empty-chat-state" class="flex-1 flex items-center justify-center bg-[#f8fafd] dark:bg-gray-950 flex-col text-center p-8 transition-colors">
-                <div class="w-48 h-48 mb-6 text-gray-200 dark:text-gray-700 opacity-50 relative">
-                    <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="50" cy="100" r="30" fill="currentColor" />
-                        <circle cx="150" cy="100" r="30" fill="currentColor" />
-                        <path d="M80 100 L120 100" stroke="currentColor" stroke-width="8" stroke-dasharray="10 10" />
-                    </svg>
+                <div class="w-32 h-32 mb-4 text-gray-300 dark:text-gray-700 flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-full">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                 </div>
-                <h2 class="text-2xl font-medium text-gray-700 dark:text-gray-300 mb-2">Secure P2P Messaging</h2>
-                <p class="text-gray-500 dark:text-gray-400 max-w-md">
-                    Messages are sent directly peer-to-peer and saved locally on your device.
+                <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-1">Encrypted P2P Messaging</h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400 max-w-xs">
+                    Select an existing conversation or start a new one to connect directly device-to-device.
                 </p>
             </div>
 
             <!-- Active Chat Interface -->
-            <div id="active-chat-interface" class="flex-1 flex-col hidden h-full">
+            <div id="active-chat-interface" class="flex-1 flex-col hidden h-full slide-in-right">
                 <!-- Chat Header -->
-                <div class="h-16 border-b border-gray-200 dark:border-gray-800 px-4 flex items-center justify-between bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm shadow-sm z-10 flex-shrink-0">
+                <div class="h-16 border-b border-gray-200 dark:border-gray-800 px-3 md:px-5 flex items-center justify-between bg-white dark:bg-gray-900 shadow-sm z-10 flex-shrink-0">
                     <div class="flex items-center gap-3">
-                        <button id="back-btn" class="md:hidden p-2 -ml-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" x2="5" y1="12" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                        <button id="back-btn" class="md:hidden p-2 -ml-1 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" x2="5" y1="12" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
                         </button>
                         <div class="relative">
-                            <img id="chat-header-avatar" src="" alt="Avatar" class="w-10 h-10 rounded-full object-cover bg-gray-100 dark:bg-gray-800" />
-                            <div id="chat-header-status-dot" class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-white dark:border-gray-900 bg-gray-400"></div>
+                            <img id="chat-header-avatar" src="" alt="Avatar" class="w-10 h-10 rounded-full object-cover bg-gray-200 dark:bg-gray-700" />
+                            <div id="chat-header-status-dot" class="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white dark:border-gray-900 bg-gray-400"></div>
                         </div>
-                        <div>
-                            <h2 id="chat-header-name" class="text-lg font-medium text-gray-800 dark:text-gray-200 leading-tight">Name</h2>
-                            <p id="chat-header-status-text" class="text-xs text-gray-500 dark:text-gray-400">Offline</p>
+                        <div class="min-w-0">
+                            <h2 id="chat-header-name" class="text-base md:text-lg font-semibold text-gray-900 dark:text-gray-100 leading-tight truncate">Name</h2>
+                            <p id="chat-header-status-text" class="text-xs text-gray-500 dark:text-gray-400 truncate">Connecting...</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- Messages List -->
-                <div id="messages-list" class="flex-1 overflow-y-auto p-4 flex flex-col gap-4 bg-[#f8fafd] dark:bg-gray-950 transition-colors">
+                <div id="messages-list" class="flex-1 overflow-y-auto p-4 flex flex-col gap-3 bg-[#f8fafd] dark:bg-gray-950">
                     <!-- Populated by JS -->
                 </div>
 
-                <!-- Connection Banner -->
-                <div id="reconnect-banner" class="hidden bg-yellow-50 dark:bg-yellow-900/30 border-t border-yellow-200 dark:border-yellow-800 p-2 text-center text-xs text-yellow-700 dark:text-yellow-400 flex items-center justify-center gap-2">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                    Peer is disconnected. Messages will not be sent until they reconnect.
-                    <button id="reconnect-btn" class="ml-2 font-bold underline hover:text-yellow-900 dark:hover:text-yellow-200">Try Reconnecting</button>
+                <!-- Reconnect Banner -->
+                <div id="reconnect-banner" class="hidden bg-amber-50 dark:bg-amber-950/40 border-t border-amber-200 dark:border-amber-900/50 px-4 py-2 text-center text-xs text-amber-800 dark:text-amber-300 flex items-center justify-between">
+                    <span class="truncate">Peer is currently offline.</span>
+                    <button id="reconnect-btn" class="px-3 py-1 bg-amber-200 dark:bg-amber-800 rounded-full text-xs font-semibold hover:opacity-90 transition-opacity flex-shrink-0 ml-2">Reconnect</button>
                 </div>
 
                 <!-- Input Area -->
-                <div class="p-3 bg-white dark:bg-gray-900 flex-shrink-0 z-20 transition-colors">
-                    <form id="message-form" class="flex items-end gap-2 bg-[#f0f4f9] dark:bg-gray-800 rounded-[24px] p-1 pr-2">
-                        <div class="flex items-center gap-1 p-1 mb-1">
-                            <button type="button" class="p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors hidden sm:block">
-                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="16"/><line x1="8" x2="16" y1="12" y2="12"/></svg>
-                            </button>
-                        </div>
+                <div class="p-2.5 md:p-3 bg-white dark:bg-gray-900 flex-shrink-0 z-20 border-t border-gray-100 dark:border-gray-800">
+                    <form id="message-form" class="flex items-center gap-2 bg-[#f0f4f9] dark:bg-gray-800/90 rounded-full px-3 py-1.5">
+                        <textarea id="message-input" placeholder="Text message" class="flex-1 max-h-28 min-h-[40px] bg-transparent border-none focus:outline-none resize-none py-2 text-sm text-gray-900 dark:text-gray-100 self-center disabled:opacity-50" rows="1"></textarea>
                         
-                        <textarea id="message-input" placeholder="Text message" class="flex-1 max-h-32 min-h-[44px] bg-transparent border-none focus:outline-none resize-none py-3 px-2 text-[15px] text-gray-800 dark:text-gray-100 self-center disabled:opacity-50" rows="1"></textarea>
-                        
-                        <div class="mb-1">
-                            <button type="submit" id="send-btn" disabled class="p-2.5 bg-[#0b57d0] text-white rounded-full hover:bg-blue-700 disabled:bg-gray-300 disabled:dark:bg-gray-700 disabled:text-gray-500 dark:disabled:text-gray-500 transition-colors flex items-center justify-center shadow-sm">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M12 14C13.66 14 15 12.66 15 11V5C15 3.34 13.66 2 12 2C10.34 2 9 3.34 9 5V11C9 12.66 10.34 14 12 14ZM11 5C11 4.45 11.45 4 12 4C12.55 4 13 4.45 13 5V11C13 11.55 12.55 12 12 12C11.45 12 11 11.55 11 11V5ZM17 11C17 13.76 14.76 16 12 16C9.24 16 7 13.76 7 11H5C5 14.53 7.61 17.43 11 17.92V21H13V17.92C16.39 17.43 19 14.53 19 11H17Z" fill="currentColor"/>
-                                </svg>
-                            </button>
-                        </div>
+                        <button type="submit" id="send-btn" disabled class="p-2.5 bg-[#0b57d0] text-white rounded-full hover:bg-blue-700 disabled:bg-gray-300 disabled:dark:bg-gray-700 disabled:text-gray-500 transition-all flex items-center justify-center flex-shrink-0 shadow-sm">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                        </button>
                     </form>
                 </div>
             </div>
@@ -255,9 +271,11 @@
         const myIdInput = document.getElementById('my-id-input');
         const myNameInput = document.getElementById('my-name-input');
         const copyBtn = document.getElementById('copy-btn');
+        
         const connectForm = document.getElementById('connect-form');
         const connectInput = document.getElementById('connect-input');
         const connectBtn = document.getElementById('connect-btn');
+        
         const contactsList = document.getElementById('contacts-list');
         const themeToggle = document.getElementById('theme-toggle');
         const iconSun = document.getElementById('icon-sun');
@@ -281,7 +299,14 @@
         const reconnectBanner = document.getElementById('reconnect-banner');
         const reconnectBtn = document.getElementById('reconnect-btn');
 
-        // Modal elements
+        // Modals & Mobile FAB
+        const openNewChatFab = document.getElementById('open-new-chat-fab');
+        const newChatModal = document.getElementById('new-chat-modal');
+        const closeNewChatBtn = document.getElementById('close-new-chat-btn');
+        const modalConnectForm = document.getElementById('modal-connect-form');
+        const modalConnectInput = document.getElementById('modal-connect-input');
+        const modalConnectBtn = document.getElementById('modal-connect-btn');
+
         const resetModal = document.getElementById('reset-modal');
         const openResetBtn = document.getElementById('open-reset-btn');
         const cancelResetBtn = document.getElementById('cancel-reset-btn');
@@ -293,27 +318,25 @@
         const storageProgressBar = document.getElementById('storage-progress-bar');
         const storageProgressText = document.getElementById('storage-progress-text');
 
-        // --- IndexedDB Wrapper ---
+        // --- IndexedDB ---
         const DB_NAME = 'P2PMessagesDB';
         const DB_VERSION = 1;
         let db;
 
-        const initDB = () => {
-            return new Promise((resolve, reject) => {
-                const request = indexedDB.open(DB_NAME, DB_VERSION);
-                request.onerror = (e) => reject("Error opening DB");
-                request.onsuccess = (e) => { db = e.target.result; resolve(db); };
-                request.onupgradeneeded = (e) => {
-                    const db = e.target.result;
-                    if (!db.objectStoreNames.contains('settings')) db.createObjectStore('settings', { keyPath: 'key' });
-                    if (!db.objectStoreNames.contains('contacts')) db.createObjectStore('contacts', { keyPath: 'id' });
-                    if (!db.objectStoreNames.contains('messages')) {
-                        const msgStore = db.createObjectStore('messages', { keyPath: 'id' });
-                        msgStore.createIndex('threadId', 'threadId', { unique: false });
-                    }
-                };
-            });
-        };
+        const initDB = () => new Promise((resolve, reject) => {
+            const request = indexedDB.open(DB_NAME, DB_VERSION);
+            request.onerror = () => reject("Error opening DB");
+            request.onsuccess = (e) => { db = e.target.result; resolve(db); };
+            request.onupgradeneeded = (e) => {
+                const db = e.target.result;
+                if (!db.objectStoreNames.contains('settings')) db.createObjectStore('settings', { keyPath: 'key' });
+                if (!db.objectStoreNames.contains('contacts')) db.createObjectStore('contacts', { keyPath: 'id' });
+                if (!db.objectStoreNames.contains('messages')) {
+                    const msgStore = db.createObjectStore('messages', { keyPath: 'id' });
+                    msgStore.createIndex('threadId', 'threadId', { unique: false });
+                }
+            };
+        });
 
         const dbPut = (storeName, data) => new Promise((resolve, reject) => {
             const tx = db.transaction(storeName, 'readwrite');
@@ -344,14 +367,14 @@
             req.onerror = () => reject(req.error);
         });
 
-        // --- Utilities ---
-        const generateRandomId = () => Math.random().toString(36).substring(2, 10);
+        // --- Helpers ---
+        const generateRandomId = () => Math.random().toString(36).substring(2, 9);
 
         const showToast = (message, type = 'info') => {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
-            toast.className = `toast-enter px-4 py-2 rounded-full shadow-lg text-sm font-medium flex items-center gap-2 pointer-events-auto ${
-                type === 'error' ? 'bg-red-600 text-white' : type === 'success' ? 'bg-green-600 text-white' : 'bg-gray-800 dark:bg-gray-700 text-white'
+            toast.className = `toast-enter px-4 py-2.5 rounded-2xl shadow-xl text-xs sm:text-sm font-medium flex items-center gap-2 pointer-events-auto ${
+                type === 'error' ? 'bg-red-600 text-white' : type === 'success' ? 'bg-emerald-600 text-white' : 'bg-gray-800 text-white dark:bg-gray-200 dark:text-gray-900'
             }`;
             toast.innerHTML = `<span>${message}</span>`;
             container.appendChild(toast);
@@ -364,31 +387,24 @@
         const updateMobileView = () => {
             if (window.innerWidth < 768) {
                 if (activeChatId) {
-                    sidebar.classList.add('hidden'); sidebar.classList.remove('flex');
-                    chatArea.classList.add('flex'); chatArea.classList.remove('hidden');
+                    sidebar.classList.add('hidden');
+                    sidebar.classList.remove('flex');
+                    chatArea.classList.add('flex');
+                    chatArea.classList.remove('hidden');
                 } else {
-                    sidebar.classList.remove('hidden'); sidebar.classList.add('flex');
-                    chatArea.classList.remove('flex'); chatArea.classList.add('hidden');
+                    sidebar.classList.remove('hidden');
+                    sidebar.classList.add('flex');
+                    chatArea.classList.remove('flex');
+                    chatArea.classList.add('hidden');
                 }
             } else {
-                sidebar.classList.remove('hidden'); sidebar.classList.add('flex');
-                chatArea.classList.remove('hidden'); chatArea.classList.add('flex');
+                sidebar.classList.remove('hidden');
+                sidebar.classList.add('flex');
+                chatArea.classList.remove('hidden');
+                chatArea.classList.add('flex');
             }
         };
 
-        // --- Notifications ---
-        const requestNotificationPermission = () => {
-            if (Notification.permission === 'default') Notification.requestPermission();
-        };
-        document.body.addEventListener('click', requestNotificationPermission, { once: true });
-
-        const triggerNotification = (senderName, text) => {
-            if (Notification.permission === 'granted' && document.hidden) {
-                new Notification(`Message from ${senderName}`, { body: text });
-            }
-        };
-
-        // --- Theme Logic ---
         const applyTheme = (dark) => {
             isDarkMode = dark;
             if (dark) {
@@ -402,47 +418,21 @@
             }
         };
 
-        const updateStorageUsage = async () => {
-            if (navigator.storage && navigator.storage.estimate) {
-                try {
-                    const estimate = await navigator.storage.estimate();
-                    const usedMB = (estimate.usage / (1024 * 1024)).toFixed(2);
-                    const quotaMB = (estimate.quota / (1024 * 1024)).toFixed(0); // usually large, so round to 0 decimals
-                    
-                    const percentUsed = Math.min((estimate.usage / estimate.quota) * 100, 100);
-                    
-                    storageProgressBar.style.width = `${percentUsed}%`;
-                    storageProgressText.textContent = `${usedMB} MB / ${quotaMB} MB`;
-                } catch (e) {
-                    storageProgressBar.style.width = '0%';
-                    storageProgressText.textContent = 'Unknown size';
-                }
-            } else {
-                storageProgressBar.style.width = '0%';
-                storageProgressText.textContent = 'Not supported';
-            }
-        };
-
-        themeToggle.addEventListener('click', async () => {
-            applyTheme(!isDarkMode);
-            await dbPut('settings', { key: 'darkMode', value: isDarkMode });
-        });
-
-        // --- Data Loading & Rendering ---
+        // --- Data Handling & Rendering ---
         const loadInitialData = async () => {
-            // Load Theme
             let themeSetting = await dbGet('settings', 'darkMode');
             if (themeSetting !== undefined) applyTheme(themeSetting.value);
             else applyTheme(window.matchMedia('(prefers-color-scheme: dark)').matches);
 
-            // Load Name
             let savedName = await dbGet('settings', 'myName');
             if (savedName && savedName.value) {
                 myName = savedName.value;
-                myNameInput.value = myName;
+            } else {
+                myName = `User_${generateRandomId().substring(0, 4)}`;
+                await dbPut('settings', { key: 'myName', value: myName });
             }
+            myNameInput.value = myName;
 
-            // Load strict one-per-device ID
             let savedId = await dbGet('settings', 'myId');
             if (savedId && savedId.value) {
                 myId = savedId.value;
@@ -452,7 +442,6 @@
             }
             myIdInput.value = myId;
 
-            // Load Contacts & Messages
             const loadedContacts = await dbGetAll('contacts');
             contacts = loadedContacts.sort((a, b) => b.timestamp - a.timestamp);
             for (const contact of contacts) {
@@ -462,11 +451,10 @@
 
             renderContacts();
             initPeerJS();
-            updateStorageUsage();
         };
 
         myNameInput.addEventListener('change', async (e) => {
-            myName = e.target.value.trim();
+            myName = e.target.value.trim() || 'User';
             await dbPut('settings', { key: 'myName', value: myName });
             showToast('Display name saved', 'success');
         });
@@ -474,9 +462,10 @@
         const renderContacts = () => {
             if (contacts.length === 0) {
                 contactsList.innerHTML = `
-                    <div class="flex flex-col items-center justify-center h-full text-gray-400 dark:text-gray-600 p-8 text-center gap-3">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg>
-                        <p class="text-sm">No connections yet. Share your ID to start chatting securely.</p>
+                    <div class="flex flex-col items-center justify-center h-64 text-gray-400 p-6 text-center gap-2">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                        <p class="text-sm font-medium">No conversations yet</p>
+                        <p class="text-xs text-gray-400">Share your ID or tap "Start chat" to connect.</p>
                     </div>
                 `;
                 return;
@@ -488,25 +477,25 @@
                 const isOnline = !!activeConnections[conv.id];
                 
                 const contactDiv = document.createElement('div');
-                contactDiv.className = `flex items-center gap-4 p-3 mx-2 my-1 rounded-2xl cursor-pointer transition-colors ${
-                    isActive ? 'bg-[#c2e7ff] dark:bg-blue-900/40' : 'hover:bg-gray-100 dark:hover:bg-gray-800'
+                contactDiv.className = `flex items-center gap-3.5 p-3 mx-2 my-1 rounded-2xl cursor-pointer transition-all active:scale-[0.99] ${
+                    isActive ? 'bg-[#c2e7ff] dark:bg-blue-950/60' : 'hover:bg-gray-100 dark:hover:bg-gray-800/60'
                 }`;
                 contactDiv.onclick = () => selectContact(conv.id);
 
                 contactDiv.innerHTML = `
                     <div class="relative flex-shrink-0">
-                        <img src="${conv.avatar}" alt="${conv.name}" class="w-12 h-12 rounded-full object-cover bg-gray-100 dark:bg-gray-700 ${!isOnline ? 'opacity-50 grayscale' : ''}" />
+                        <img src="${conv.avatar}" alt="${conv.name}" class="w-12 h-12 rounded-full object-cover bg-gray-200 dark:bg-gray-700 ${!isOnline ? 'grayscale opacity-75' : ''}" />
                         ${conv.unread > 0 ? `<div class="absolute -top-1 -right-1 bg-[#0b57d0] text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white dark:border-gray-900">${conv.unread}</div>` : ''}
-                        <div class="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white dark:border-gray-900 ${isOnline ? 'bg-green-500' : 'bg-gray-400'}"></div>
+                        <div class="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white dark:border-gray-900 ${isOnline ? 'bg-emerald-500' : 'bg-gray-400'}"></div>
                     </div>
                     <div class="flex-1 min-w-0">
                         <div class="flex justify-between items-baseline mb-0.5">
-                            <h3 class="text-[15px] truncate ${conv.unread > 0 ? 'font-bold text-gray-900 dark:text-gray-100' : 'font-medium text-gray-800 dark:text-gray-300'}">${conv.name}</h3>
-                            <span class="text-xs flex-shrink-0 ml-2 ${conv.unread > 0 ? 'font-bold text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-500'}">
+                            <h3 class="text-sm truncate ${conv.unread > 0 ? 'font-bold text-gray-900 dark:text-gray-100' : 'font-semibold text-gray-800 dark:text-gray-200'}">${conv.name}</h3>
+                            <span class="text-[11px] flex-shrink-0 ml-2 ${conv.unread > 0 ? 'font-bold text-blue-600 dark:text-blue-400' : 'text-gray-400'}">
                                 ${conv.timestamp ? new Date(conv.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : ''}
                             </span>
                         </div>
-                        <p class="text-[14px] truncate ${conv.unread > 0 ? 'font-bold text-gray-800 dark:text-gray-200' : 'text-gray-500 dark:text-gray-500'}">${conv.lastMessage || 'Connected'}</p>
+                        <p class="text-xs truncate ${conv.unread > 0 ? 'font-semibold text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-400'}">${conv.lastMessage || 'Tap to chat'}</p>
                     </div>
                 `;
                 contactsList.appendChild(contactDiv);
@@ -520,11 +509,11 @@
             const isOnline = !!activeConnections[activeContact.id];
             chatHeaderAvatar.src = activeContact.avatar;
             chatHeaderName.textContent = activeContact.name;
-            chatHeaderStatusText.textContent = isOnline ? 'Online (P2P)' : 'Offline (Disconnected)';
-            chatHeaderStatusDot.className = `absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-white dark:border-gray-900 ${isOnline ? 'bg-green-500' : 'bg-gray-400'}`;
+            chatHeaderStatusText.textContent = isOnline ? 'Online' : 'Offline';
+            chatHeaderStatusDot.className = `absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-white dark:border-gray-900 ${isOnline ? 'bg-emerald-500' : 'bg-gray-400'}`;
             
             messageInput.disabled = !isOnline;
-            messageInput.placeholder = isOnline ? 'Text message' : 'Waiting for peer to connect...';
+            messageInput.placeholder = isOnline ? 'Text message' : 'Waiting for peer...';
             
             isOnline ? reconnectBanner.classList.add('hidden') : reconnectBanner.classList.remove('hidden');
             updateSendButtonState();
@@ -534,9 +523,9 @@
             const currentMessages = messages[activeChatId] || [];
             if (currentMessages.length === 0) {
                 messagesList.innerHTML = `
-                    <div class="m-auto text-center p-6 max-w-sm">
-                        <div class="bg-blue-50 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300 rounded-2xl p-4 text-sm inline-block shadow-sm border border-blue-100 dark:border-blue-900/50">
-                            Say hi! Messages are saved securely on your device.
+                    <div class="m-auto text-center p-6 max-w-xs">
+                        <div class="bg-blue-50 dark:bg-blue-950/40 text-blue-900 dark:text-blue-200 rounded-2xl p-4 text-xs shadow-sm border border-blue-100 dark:border-blue-900/50">
+                            🔒 Connected! Messages are end-to-end peer-to-peer and saved locally on your device.
                         </div>
                     </div>
                 `;
@@ -555,21 +544,21 @@
                 msgDiv.className = `flex w-full ${isMe ? 'justify-end' : 'justify-start'}`;
                 
                 msgDiv.innerHTML = `
-                    <div class="flex max-w-[85%] md:max-w-[70%] items-end gap-2">
+                    <div class="flex max-w-[85%] md:max-w-[75%] items-end gap-2">
                         ${!isMe ? `
-                            <div class="w-8 h-8 flex-shrink-0">
-                                ${showAvatar ? `<img src="${activeContact.avatar}" class="w-8 h-8 rounded-full object-cover bg-gray-200 dark:bg-gray-700" />` : '<div class="w-8 h-8"></div>'}
+                            <div class="w-7 h-7 flex-shrink-0">
+                                ${showAvatar ? `<img src="${activeContact.avatar}" class="w-7 h-7 rounded-full object-cover bg-gray-200 dark:bg-gray-700" />` : '<div class="w-7 h-7"></div>'}
                             </div>
                         ` : ''}
                         <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'}">
-                            <div class="px-4 py-2.5 text-[15px] shadow-sm ${
+                            <div class="px-4 py-2.5 text-sm shadow-sm ${
                                 isMe 
-                                    ? 'bg-[#0b57d0] text-white rounded-l-2xl rounded-tr-2xl rounded-br-sm' 
-                                    : 'bg-[#f0f4f9] dark:bg-gray-800 text-gray-800 dark:text-gray-100 border border-gray-100 dark:border-gray-700 rounded-r-2xl rounded-tl-2xl rounded-bl-sm'
+                                    ? 'bg-[#0b57d0] text-white rounded-2xl rounded-br-xs' 
+                                    : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-100 dark:border-gray-700/80 rounded-2xl rounded-bl-xs'
                             }" style="word-break: break-word;">
                                 ${msg.text}
                             </div>
-                            <span class="text-[11px] text-gray-400 dark:text-gray-500 mt-1 mx-1">${timeString}</span>
+                            <span class="text-[10px] text-gray-400 dark:text-gray-500 mt-1 mx-1">${timeString}</span>
                         </div>
                     </div>
                 `;
@@ -593,7 +582,7 @@
             renderChatHeader();
             renderMessages();
             updateMobileView();
-            setTimeout(() => messageInput.focus(), 100);
+            setTimeout(() => messageInput.focus(), 150);
         };
 
         const updateSendButtonState = () => {
@@ -601,19 +590,20 @@
             sendBtn.disabled = !isOnline || messageInput.value.trim().length === 0;
         };
 
-        // --- PeerJS Logic ---
+        // --- PeerJS WebRTC Logic Fixes ---
         const initPeerJS = () => {
             peerInstance = new Peer(myId, {
+                debug: 1,
                 config: {'iceServers': [
-                    { url: 'stun:stun.l.google.com:19302' },
-                    { url: 'stun:stun1.l.google.com:19302' }
+                    { urls: 'stun:stun.l.google.com:19302' },
+                    { urls: 'stun:stun1.l.google.com:19302' }
                 ]}
             });
 
             peerInstance.on('open', (id) => {
                 connectionStatusEl.innerHTML = `
-                    <span class="flex items-center gap-1 text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-900/30 px-2 py-1 rounded-full">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" x2="12.01" y1="20" y2="20"/></svg>
+                    <span class="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2.5 py-1 rounded-full">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
                         Ready
                     </span>
                 `;
@@ -625,34 +615,33 @@
 
             peerInstance.on('error', (err) => {
                 console.error("PeerJS Error:", err);
-                if (err.type === 'unavailable-id') {
-                    // Force single ID logic: If ID is in use, do NOT generate a new one. 
-                    // Tell user to close other tabs, and retry.
-                    connectionStatusEl.innerHTML = `<span class="text-red-500 text-xs">Session active elsewhere. Retrying...</span>`;
-                    showToast("ID in use by another tab. Please close it.", "error");
-                    
-                    if (peerInstance) peerInstance.destroy();
-                    setTimeout(initPeerJS, 5000); // Retry after 5s
+                if (err.type === 'peer-not-found') {
+                    showToast("Peer ID not found. Ensure friend is online.", "error");
+                } else if (err.type === 'unavailable-id') {
+                    showToast("ID active in another tab.", "error");
                 } else {
-                    showToast(`Network Error: ${err.type}`, "error");
+                    showToast(`Connection Error: ${err.type}`, "error");
                 }
             });
         };
 
         const connectToPeer = (peerId) => {
-            if (!peerInstance || peerId === myId) return;
+            if (!peerInstance || !peerId || peerId === myId) return;
             showToast(`Connecting to ${peerId}...`);
             
-            // Pass myName in metadata during handshake
-            const conn = peerInstance.connect(peerId, { reliable: true, metadata: { senderName: myName } });
+            const conn = peerInstance.connect(peerId, { 
+                reliable: true,
+                metadata: { senderName: myName }
+            });
+            
             setupConnectionListeners(conn);
         };
 
         const setupConnectionListeners = (conn) => {
-            conn.on('open', async () => {
+            // Immediate listener attachment
+            const handleOpen = async () => {
                 activeConnections[conn.peer] = conn;
                 
-                // Get the remote name from metadata, fallback to peer ID
                 const remoteName = conn.metadata?.senderName || `Peer ${conn.peer.substring(0, 5)}`;
                 
                 let contact = contacts.find(c => c.id === conn.peer);
@@ -661,22 +650,28 @@
                         id: conn.peer,
                         name: remoteName,
                         avatar: `https://api.dicebear.com/7.x/identicon/svg?seed=${conn.peer}`,
-                        lastMessage: 'Connected via P2P',
+                        lastMessage: 'Connected',
                         timestamp: Date.now(),
                         unread: 0
                     };
                     contacts.unshift(contact);
-                    messages[conn.peer] = [];
-                } else if (conn.metadata?.senderName && contact.name !== conn.metadata.senderName) {
-                    // Update name if they changed it
+                    messages[conn.peer] = messages[conn.peer] || [];
+                } else if (conn.metadata?.senderName) {
                     contact.name = conn.metadata.senderName;
                 }
                 
                 await dbPut('contacts', contact);
-                showToast(`Connected to ${contact.name}`, 'success');
+                showToast(`Connected with ${contact.name}`, 'success');
+                
                 renderContacts();
-                if (activeChatId === conn.peer) renderChatHeader();
-            });
+                selectContact(conn.peer);
+            };
+
+            if (conn.open) {
+                handleOpen();
+            } else {
+                conn.on('open', handleOpen);
+            }
 
             conn.on('data', async (data) => {
                 if (data.type === 'chat') {
@@ -696,12 +691,10 @@
                     if (contact) {
                         contact.lastMessage = msg.text;
                         contact.timestamp = msg.timestamp;
-                        // Update name dynamically if sent in chat payload
-                        if (data.senderName) contact.name = data.senderName; 
+                        if (data.senderName) contact.name = data.senderName;
                         
                         if (activeChatId !== conn.peer) {
                             contact.unread = (contact.unread || 0) + 1;
-                            triggerNotification(contact.name, msg.text);
                         }
                         await dbPut('contacts', contact);
                         contacts.sort((a, b) => b.timestamp - a.timestamp);
@@ -712,17 +705,14 @@
                 }
             });
 
-            conn.on('close', () => {
+            const handleClose = () => {
                 delete activeConnections[conn.peer];
                 renderContacts();
                 if (activeChatId === conn.peer) renderChatHeader();
-            });
+            };
 
-            conn.on('error', (err) => {
-                delete activeConnections[conn.peer];
-                renderContacts();
-                if (activeChatId === conn.peer) renderChatHeader();
-            });
+            conn.on('close', handleClose);
+            conn.on('error', handleClose);
         };
 
         // --- Event Listeners ---
@@ -736,28 +726,38 @@
                     document.getElementById('icon-copy').classList.remove('hidden');
                     document.getElementById('icon-check').classList.add('hidden');
                 }, 2000);
-            }).catch(() => {
-                myIdInput.select();
-                document.execCommand('copy');
-                showToast('ID copied (fallback)', 'success');
             });
         });
 
-        connectInput.addEventListener('input', (e) => {
-            connectBtn.disabled = e.target.value.trim().length === 0;
-        });
-
+        // Desktop Connect Form
+        connectInput.addEventListener('input', (e) => connectBtn.disabled = e.target.value.trim().length === 0);
         connectForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const connectToId = connectInput.value.trim();
-            if (!connectToId || connectToId === myId) return;
-            connectToPeer(connectToId);
-            connectInput.value = '';
-            connectBtn.disabled = true;
+            if (connectToId) {
+                connectToPeer(connectToId);
+                connectInput.value = '';
+                connectBtn.disabled = true;
+            }
         });
 
+        // Mobile New Chat Modal Form
+        modalConnectInput.addEventListener('input', (e) => modalConnectBtn.disabled = e.target.value.trim().length === 0);
+        modalConnectForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const connectToId = modalConnectInput.value.trim();
+            if (connectToId) {
+                connectToPeer(connectToId);
+                modalConnectInput.value = '';
+                modalConnectBtn.disabled = true;
+                newChatModal.classList.add('hidden');
+            }
+        });
+
+        openNewChatFab.addEventListener('click', () => newChatModal.classList.remove('hidden'));
+        closeNewChatBtn.addEventListener('click', () => newChatModal.classList.add('hidden'));
+
         messageInput.addEventListener('input', updateSendButtonState);
-        
         messageInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
@@ -783,7 +783,6 @@
             };
 
             try {
-                // Include senderName in payload to update dynamic name changes mid-chat
                 conn.send({ type: 'chat', text: text, timestamp: timestamp, senderName: myName });
 
                 await dbPut('messages', msgData);
@@ -803,7 +802,6 @@
                 
                 renderContacts();
                 renderMessages();
-                updateStorageUsage();
             } catch (err) {
                 showToast("Failed to send message", "error");
             }
@@ -818,33 +816,25 @@
             if (activeChatId) connectToPeer(activeChatId);
         });
 
-        // Settings & Reset Event Listeners
-        openSettingsBtn.addEventListener('click', () => {
-            updateStorageUsage();
-            settingsModal.classList.remove('hidden');
-        });
-        
+        // Settings & Reset Events
+        openSettingsBtn.addEventListener('click', () => settingsModal.classList.remove('hidden'));
         closeSettingsBtn.addEventListener('click', () => settingsModal.classList.add('hidden'));
-
         openResetBtn.addEventListener('click', () => {
             settingsModal.classList.add('hidden');
             resetModal.classList.remove('hidden');
         });
-        
         cancelResetBtn.addEventListener('click', () => resetModal.classList.add('hidden'));
         confirmResetBtn.addEventListener('click', () => {
             resetModal.classList.add('hidden');
             if (peerInstance) peerInstance.destroy();
             if (db) db.close();
-            
             const req = indexedDB.deleteDatabase(DB_NAME);
-            req.onsuccess = () => {
-                showToast("Data reset successfully. Reloading...", "success");
-                setTimeout(() => window.location.reload(), 1500);
-            };
-            req.onerror = () => {
-                showToast("Error resetting data", "error");
-            };
+            req.onsuccess = () => window.location.reload();
+        });
+
+        themeToggle.addEventListener('click', async () => {
+            applyTheme(!isDarkMode);
+            await dbPut('settings', { key: 'darkMode', value: isDarkMode });
         });
 
         window.addEventListener('resize', updateMobileView);
@@ -854,7 +844,7 @@
                 await loadInitialData();
                 updateMobileView();
             } catch (error) {
-                showToast("Failed to load database.", "error");
+                showToast("Failed to initialize.", "error");
             }
         });
     </script>
