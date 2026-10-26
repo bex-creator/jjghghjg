@@ -64,6 +64,73 @@
     <!-- Toast Notifications Container -->
     <div id="toast-container" class="fixed bottom-20 md:bottom-6 left-1/2 transform -translate-x-1/2 z-50 flex flex-col gap-2 pointer-events-none w-11/12 max-w-md"></div>
 
+    <!-- Hidden Admin Test Mode Panel Modal -->
+    <div id="admin-modal" class="fixed inset-0 z-[70] flex items-center justify-center bg-black/60 backdrop-blur-md hidden transition-opacity">
+        <div class="bg-white dark:bg-gray-900 p-6 rounded-3xl shadow-2xl max-w-lg w-full mx-4 border border-amber-500/40 dark:border-amber-500/30 max-h-[90vh] flex flex-col">
+            <div class="flex justify-between items-center pb-4 border-b border-gray-200 dark:border-gray-800">
+                <div class="flex items-center gap-2.5">
+                    <span class="p-2 bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded-xl">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+                    </span>
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white leading-tight">Admin Test Panel</h3>
+                        <p class="text-xs text-amber-600 dark:text-amber-400 font-mono">Secret Code "7865" Unlocked</p>
+                    </div>
+                </div>
+                <button id="close-admin-btn" class="p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto py-4 space-y-4">
+                <!-- Virtual Echo Bot Section -->
+                <div class="p-4 bg-amber-500/5 dark:bg-amber-500/10 rounded-2xl border border-amber-500/20 space-y-2">
+                    <h4 class="text-sm font-bold text-amber-800 dark:text-amber-300 flex items-center justify-between">
+                        <span>🤖 Virtual Bot Connection (Single Device Testing)</span>
+                        <span class="text-[10px] uppercase font-mono px-2 py-0.5 bg-amber-500/20 text-amber-700 dark:text-amber-300 rounded-md">Mock Peer</span>
+                    </h4>
+                    <p class="text-xs text-gray-600 dark:text-gray-400">Instantly creates a virtual peer connection to test chat functions, instant echo messages, notifications, and IndexedDB saving without needing a second device.</p>
+                    <button id="admin-connect-bot-btn" class="w-full py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-medium text-xs rounded-xl shadow-sm transition-colors flex items-center justify-center gap-2">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2 2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/><rect x="4" y="8" width="16" height="12" rx="2"/><circle cx="9" cy="13" r="1"/><circle cx="15" cy="13" r="1"/></svg>
+                        Connect Test Echo Bot
+                    </button>
+                </div>
+
+                <!-- WebRTC Diagnostics -->
+                <div class="p-4 bg-gray-50 dark:bg-gray-800/60 rounded-2xl border border-gray-200 dark:border-gray-700 space-y-3">
+                    <h4 class="text-sm font-bold text-gray-900 dark:text-white">📡 WebRTC Diagnostics & Simulation</h4>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <button id="admin-test-stun-btn" class="p-2.5 bg-white dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-600 text-xs font-semibold rounded-xl text-left transition-colors flex items-center justify-between">
+                            <span>Test STUN/TURN ICE</span>
+                            <span class="text-[10px] text-gray-400 font-mono">Check Network</span>
+                        </button>
+
+                        <button id="admin-simulate-drop-btn" class="p-2.5 bg-white dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 text-red-600 dark:text-red-400 border border-gray-200 dark:border-gray-600 text-xs font-semibold rounded-xl text-left transition-colors flex items-center justify-between">
+                            <span>Force Drop Peer Sockets</span>
+                            <span class="text-[10px] text-red-400 font-mono">Test Drop</span>
+                        </button>
+                    </div>
+
+                    <button id="admin-simulate-incoming-btn" class="w-full p-2.5 bg-blue-50 dark:bg-blue-950/40 hover:bg-blue-100 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-900/60 text-xs font-semibold rounded-xl text-center transition-colors">
+                        📩 Simulate Fake Incoming Message
+                    </button>
+                </div>
+
+                <!-- Output Log Container -->
+                <div class="space-y-1">
+                    <div class="flex justify-between items-center">
+                        <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Console Logs</label>
+                        <button id="admin-clear-log-btn" class="text-[10px] text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">Clear</button>
+                    </div>
+                    <div id="admin-console-log" class="p-3 bg-gray-950 text-emerald-400 font-mono text-[11px] rounded-xl h-32 overflow-y-auto space-y-1 border border-gray-800">
+                        <div>[SYSTEM] Admin Test Mode Ready.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Custom Modal for New Chat (Mobile FAB Action) -->
     <div id="new-chat-modal" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm hidden transition-opacity">
         <div class="bg-white dark:bg-gray-900 p-6 rounded-t-3xl sm:rounded-2xl shadow-xl w-full max-w-md border border-gray-200 dark:border-gray-800">
@@ -307,6 +374,16 @@
         const modalConnectInput = document.getElementById('modal-connect-input');
         const modalConnectBtn = document.getElementById('modal-connect-btn');
 
+        // Admin Modal & Diagnostics Elements
+        const adminModal = document.getElementById('admin-modal');
+        const closeAdminBtn = document.getElementById('close-admin-btn');
+        const adminConnectBotBtn = document.getElementById('admin-connect-bot-btn');
+        const adminTestStunBtn = document.getElementById('admin-test-stun-btn');
+        const adminSimulateDropBtn = document.getElementById('admin-simulate-drop-btn');
+        const adminSimulateIncomingBtn = document.getElementById('admin-simulate-incoming-btn');
+        const adminConsoleLog = document.getElementById('admin-console-log');
+        const adminClearLogBtn = document.getElementById('admin-clear-log-btn');
+
         const resetModal = document.getElementById('reset-modal');
         const openResetBtn = document.getElementById('open-reset-btn');
         const cancelResetBtn = document.getElementById('cancel-reset-btn');
@@ -383,6 +460,39 @@
                 setTimeout(() => toast.remove(), 300);
             }, 3000);
         };
+
+        // Admin Console Logging
+        const adminLog = (msg, level = 'INFO') => {
+            console.log(`[ADMIN ${level}]`, msg);
+            if (!adminConsoleLog) return;
+            const logItem = document.createElement('div');
+            const timestamp = new Date().toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            logItem.className = level === 'ERR' ? 'text-red-400' : level === 'WARN' ? 'text-amber-300' : 'text-emerald-400';
+            logItem.textContent = `[${timestamp}] [${level}] ${msg}`;
+            adminConsoleLog.appendChild(logItem);
+            adminConsoleLog.scrollTop = adminConsoleLog.scrollHeight;
+        };
+
+        // Key Listener for Secret Code "7865"
+        let secretCodeBuffer = '';
+        window.addEventListener('keydown', (e) => {
+            // Ignore keypresses inside text inputs or textareas
+            if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
+            
+            if (e.key >= '0' && e.key <= '9') {
+                secretCodeBuffer += e.key;
+                if (secretCodeBuffer.length > 4) {
+                    secretCodeBuffer = secretCodeBuffer.slice(-4);
+                }
+                
+                if (secretCodeBuffer === '7865') {
+                    secretCodeBuffer = '';
+                    adminModal.classList.remove('hidden');
+                    showToast('⚡ Secret Admin Mode Unlocked!', 'success');
+                    adminLog('Admin mode unlocked via passcode "7865"');
+                }
+            }
+        });
 
         const updateMobileView = () => {
             if (window.innerWidth < 768) {
@@ -641,6 +751,7 @@
             // Immediate listener attachment
             const handleOpen = async () => {
                 activeConnections[conn.peer] = conn;
+                adminLog(`Data channel open with peer: ${conn.peer}`);
                 
                 const remoteName = conn.metadata?.senderName || `Peer ${conn.peer.substring(0, 5)}`;
                 
@@ -674,6 +785,7 @@
             }
 
             conn.on('data', async (data) => {
+                adminLog(`Received payload from ${conn.peer}: ${JSON.stringify(data)}`);
                 if (data.type === 'chat') {
                     const msg = {
                         id: crypto.randomUUID(),
@@ -706,14 +818,175 @@
             });
 
             const handleClose = () => {
+                adminLog(`Connection closed for peer: ${conn.peer}`, 'WARN');
                 delete activeConnections[conn.peer];
                 renderContacts();
                 if (activeChatId === conn.peer) renderChatHeader();
             };
 
             conn.on('close', handleClose);
-            conn.on('error', handleClose);
+            conn.on('error', (err) => {
+                adminLog(`Connection error on ${conn.peer}: ${err}`, 'ERR');
+                handleClose();
+            });
         };
+
+        // --- Admin Diagnostic Tools Logic ---
+        closeAdminBtn.addEventListener('click', () => adminModal.classList.add('hidden'));
+        adminClearLogBtn.addEventListener('click', () => adminConsoleLog.innerHTML = '');
+
+        // Virtual Bot Setup
+        adminConnectBotBtn.addEventListener('click', async () => {
+            const botId = 'bot_test_echo';
+            adminLog(`Initializing local Echo Bot connection (${botId})...`);
+
+            // Create fake connection object mimicking WebRTC DataConnection
+            const botConnection = {
+                peer: botId,
+                open: true,
+                metadata: { senderName: '🤖 Test Echo Bot' },
+                send: function(payload) {
+                    adminLog(`[BOT RECEIVE] ${JSON.stringify(payload)}`);
+                    if (payload.type === 'chat') {
+                        setTimeout(async () => {
+                            let botReply = `Echo: "${payload.text}"`;
+                            const lowerText = payload.text.toLowerCase().trim();
+                            if (lowerText === 'ping') botReply = 'Pong! 🏓 P2P pipeline responsive.';
+                            else if (lowerText === 'time') botReply = `Current time: ${new Date().toLocaleTimeString()}`;
+                            else if (lowerText === 'about') botReply = 'I am the built-in Admin Test Bot running locally on your device!';
+
+                            const replyMsg = {
+                                type: 'chat',
+                                text: botReply,
+                                timestamp: Date.now(),
+                                senderName: '🤖 Test Echo Bot'
+                            };
+
+                            // Deliver directly to receiver handler
+                            if (this.onDataHandler) this.onDataHandler(replyMsg);
+                        }, 500);
+                    }
+                },
+                on: function(event, handler) {
+                    if (event === 'data') this.onDataHandler = handler;
+                },
+                close: function() {
+                    if (this.onCloseHandler) this.onCloseHandler();
+                }
+            };
+
+            setupConnectionListeners(botConnection);
+            // Trigger open callback
+            if (botConnection.open) {
+                activeConnections[botId] = botConnection;
+                
+                let contact = contacts.find(c => c.id === botId);
+                if (!contact) {
+                    contact = {
+                        id: botId,
+                        name: '🤖 Test Echo Bot',
+                        avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=echobot`,
+                        lastMessage: 'Ready for test messages',
+                        timestamp: Date.now(),
+                        unread: 0
+                    };
+                    contacts.unshift(contact);
+                    messages[botId] = messages[botId] || [];
+                }
+                await dbPut('contacts', contact);
+                renderContacts();
+                selectContact(botId);
+                adminLog('Test Bot connected and loaded into contact list!', 'INFO');
+                showToast('Test Echo Bot connected!', 'success');
+            }
+        });
+
+        // Test STUN ICE Candidate gathering
+        adminTestStunBtn.addEventListener('click', async () => {
+            adminLog('Initiating WebRTC STUN/ICE Candidates check...');
+            try {
+                const pc = new RTCPeerConnection({
+                    iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+                });
+                pc.createDataChannel('test-channel');
+                pc.onicecandidate = (e) => {
+                    if (e.candidate) {
+                        adminLog(`ICE Candidate found: ${e.candidate.protocol} ${e.candidate.address || ''}:${e.candidate.port || ''}`);
+                    } else {
+                        adminLog('ICE candidate gathering completed successfully!', 'INFO');
+                    }
+                };
+                const offer = await pc.createOffer();
+                await pc.setLocalDescription(offer);
+                showToast('ICE STUN check running in logs', 'info');
+            } catch (err) {
+                adminLog(`STUN Check error: ${err.message}`, 'ERR');
+            }
+        });
+
+        // Simulate Network Socket Drop
+        adminSimulateDropBtn.addEventListener('click', () => {
+            const activeKeys = Object.keys(activeConnections);
+            if (activeKeys.length === 0) {
+                adminLog('No active connections to drop.', 'WARN');
+                showToast('No active connections to drop', 'error');
+                return;
+            }
+            activeKeys.forEach(key => {
+                adminLog(`Simulating drop on connection: ${key}`, 'WARN');
+                if (activeConnections[key] && activeConnections[key].close) {
+                    activeConnections[key].close();
+                }
+                delete activeConnections[key];
+            });
+            renderContacts();
+            if (activeChatId) renderChatHeader();
+            showToast('All active peer sockets closed', 'error');
+        });
+
+        // Simulate Fake Incoming Message
+        adminSimulateIncomingBtn.addEventListener('click', async () => {
+            const fakePeerId = 'peer_simulated_user';
+            const fakeName = 'Simulated Peer';
+            
+            adminLog(`Injecting fake incoming message from ${fakePeerId}...`);
+
+            const msg = {
+                id: crypto.randomUUID(),
+                threadId: fakePeerId,
+                text: 'This is a test message generated from the Admin panel!',
+                senderId: fakePeerId,
+                timestamp: Date.now()
+            };
+
+            await dbPut('messages', msg);
+            if (!messages[fakePeerId]) messages[fakePeerId] = [];
+            messages[fakePeerId].push(msg);
+
+            let contact = contacts.find(c => c.id === fakePeerId);
+            if (!contact) {
+                contact = {
+                    id: fakePeerId,
+                    name: fakeName,
+                    avatar: `https://api.dicebear.com/7.x/identicon/svg?seed=${fakePeerId}`,
+                    lastMessage: msg.text,
+                    timestamp: msg.timestamp,
+                    unread: activeChatId === fakePeerId ? 0 : 1
+                };
+                contacts.unshift(contact);
+            } else {
+                contact.lastMessage = msg.text;
+                contact.timestamp = msg.timestamp;
+                if (activeChatId !== fakePeerId) contact.unread = (contact.unread || 0) + 1;
+            }
+
+            await dbPut('contacts', contact);
+            contacts.sort((a, b) => b.timestamp - a.timestamp);
+
+            renderContacts();
+            if (activeChatId === fakePeerId) renderMessages();
+            showToast('Fake incoming message injected', 'success');
+        });
 
         // --- Event Listeners ---
         copyBtn.addEventListener('click', () => {
